@@ -1,4 +1,4 @@
-package rTablets;
+package rDarkTablets;
 
 import org.powbot.api.rt4.Component;
 import org.powbot.api.rt4.Widgets;

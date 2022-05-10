@@ -1,4 +1,4 @@
-package rTablets;
+package rDarkTablets;
 
 import org.powbot.api.rt4.*;
 import org.powbot.api.rt4.walking.model.Skill;
@@ -9,16 +9,14 @@ import org.powbot.api.script.paint.TrackInventoryOption;
 import org.powbot.api.script.paint.TrackSkillOption;
 import org.powbot.mobile.script.ScriptManager;
 import org.powbot.mobile.service.ScriptUploader;
-import rTablets.Tasks.Convert;
-import rTablets.Tasks.Mine;
-import rTablets.Tasks.Tablet;
+import rDarkTablets.Tasks.*;
 
 import java.util.ArrayList;
 
 import org.powbot.api.Random;
 
-@ScriptManifest(name = "rTablets", description = "Creates tablets in Arceuus.",
-        version = "0.1.0", category = ScriptCategory.MoneyMaking)
+@ScriptManifest(name = "rDarkTablets", description = "Creates tablets in Arceuus.",
+        version = "0.2.0", category = ScriptCategory.MoneyMaking)
 
 @ScriptConfiguration.List(
         {
@@ -36,39 +34,35 @@ import org.powbot.api.Random;
         }
 )
 
-public class rTablets extends AbstractScript {
+public class rDarkTablets extends AbstractScript {
     private final ArrayList<Task> taskList = new ArrayList<>();
     private Task currentTask = null;
 
-    /*
-    Script Tasks
-    --------------
-    Precheck: Check player is in area, has pick-axe & chisel
-    1) Go to Dense essence mine : Mine until inventory is full
-    2) Go to dark altar, convert essence to dark essence : Until all essence converted
-    3) Go to lectern, convert tablets : Until all essence are converted
-    REPEAT FROM HERE
-     */
-
     public static void main(String[] args) {
-        new ScriptUploader().uploadAndStart("rTablets", "", "127.0.0.1:5685", true, false);
+        new ScriptUploader().uploadAndStart("rDarkTablets", "", "127.0.0.1:5675", true, false);
     }
 
 
     @Override
     public void onStart() {
         // Two required items for this script: Pickaxe, chisel
-        Item pickaxe = Inventory.stream().filter(i -> i.name().toLowerCase().contains("pickaxe")).first();
+        Item inventoryPickaxe = Inventory.stream().filter(i -> i.name().toLowerCase().contains("pickaxe")).first();
+        Item equipmentPickaxe = Equipment.stream().filter(i -> i.name().toLowerCase().contains("pickaxe")).first();
         Item chisel = Inventory.stream().name("Chisel").first();
 
         Constants.tabletName = getOption("Select Tablet");
         Constants.enableTeleport = getOption("Library Teleport");
 
         // Make sure we have pickaxe + chisel
-        if (pickaxe.valid() && chisel.valid()) {
-            taskList.add(new Mine("Mine"));
-            taskList.add(new Convert("Convert"));
-            taskList.add(new Tablet("Tablet"));
+        if (inventoryPickaxe.valid() || equipmentPickaxe.valid() && chisel.valid()) {
+            taskList.add(new WalkToMine("Walking to Mine"));
+            taskList.add(new Mine("Mine Essence"));
+            taskList.add(new WalkToAltar("Walking to Altar"));
+            taskList.add(new Convert("Convert Essence"));
+            taskList.add(new Teleport("Teleport"));
+            taskList.add(new WalkToLectern("Walking to Lectern"));
+            taskList.add(new OpenLectern("Open Lectern"));
+            taskList.add(new CraftTablets("Create Tablets"));
         } else {
             ScriptManager.INSTANCE.stop();
         }
@@ -90,9 +84,11 @@ public class rTablets extends AbstractScript {
 
     @Override
     public void poll() {
+        System.out.println("[DEBUG] New Poll Begun");
         for (Task task : taskList) {
             if (task.activate()) {
                 currentTask = task;
+                System.out.println("[DEBUG] Current task: " + currentTask.name);
                 task.execute();
                 if (ScriptManager.INSTANCE.isStopping()) {
                     break;
@@ -105,5 +101,6 @@ public class rTablets extends AbstractScript {
                 Camera.angle(Random.nextInt(0, 359));
             }
         }
+//        System.out.println("[DEBUG] Poll complete");
     }
 }
