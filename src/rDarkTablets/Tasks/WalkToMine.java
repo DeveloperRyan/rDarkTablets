@@ -1,9 +1,10 @@
 package rDarkTablets.Tasks;
 
+import org.powbot.api.Tile;
 import org.powbot.api.rt4.Inventory;
 import org.powbot.api.rt4.Movement;
 import org.powbot.api.rt4.Players;
-import org.powbot.api.rt4.walking.Walking;
+import org.powbot.api.rt4.walking.local.Flag;
 import org.powbot.mobile.script.ScriptManager;
 import rDarkTablets.Constants;
 import rDarkTablets.Task;
@@ -15,16 +16,16 @@ public class WalkToMine extends Task {
 
     @Override
     public boolean activate() {
-
-        return !Constants.essenceMineArea.contains(Players.local().tile())
-                && Inventory.stream().filter(i -> i.name().equals("Dark essence block")).isEmpty()
+        return !Constants.ESSENCE_MINE_AREA.contains(Players.local().tile())
+                && Inventory.stream().name(Constants.DARK_ESSENCE_BLOCK).isEmpty()
                 && !Inventory.isFull();
     }
 
     @Override
     public void execute() {
         System.out.println("[DEBUG] Walking to Mine");
-        Movement.builder(Constants.essenceMineArea.getRandomTile())
+
+        Movement.builder(Constants.ESSENCE_MINE_WALKABLE.getRandomTile())
                 .setRunMin(20).setRunMax(50)
                 .setWalkUntil(() -> ScriptManager.INSTANCE.isPaused() || ScriptManager.INSTANCE.isStopping())
                 .move();

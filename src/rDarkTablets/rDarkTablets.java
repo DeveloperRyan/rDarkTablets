@@ -13,10 +13,8 @@ import rDarkTablets.Tasks.*;
 
 import java.util.ArrayList;
 
-import org.powbot.api.Random;
-
 @ScriptManifest(name = "rDarkTablets", description = "Creates tablets in Arceuus.",
-        version = "0.2.0", category = ScriptCategory.MoneyMaking)
+        version = "0.2.1", category = ScriptCategory.MoneyMaking)
 
 @ScriptConfiguration.List(
         {
@@ -54,7 +52,7 @@ public class rDarkTablets extends AbstractScript {
         Constants.enableTeleport = getOption("Library Teleport");
 
         // Make sure we have pickaxe + chisel
-        if (inventoryPickaxe.valid() || equipmentPickaxe.valid() && chisel.valid()) {
+        if ((inventoryPickaxe.valid() || equipmentPickaxe.valid()) && chisel.valid()) {
             taskList.add(new WalkToMine("Walking to Mine"));
             taskList.add(new Mine("Mine Essence"));
             taskList.add(new WalkToAltar("Walking to Altar"));
@@ -84,7 +82,7 @@ public class rDarkTablets extends AbstractScript {
 
     @Override
     public void poll() {
-        System.out.println("[DEBUG] New Poll Begun");
+//        System.out.println("[DEBUG] New Poll Begun");
         for (Task task : taskList) {
             if (task.activate()) {
                 currentTask = task;
@@ -93,12 +91,6 @@ public class rDarkTablets extends AbstractScript {
                 if (ScriptManager.INSTANCE.isStopping()) {
                     break;
                 }
-            }
-        }
-
-        if (Random.nextInt(0, 500) == 1) {
-            if (Random.nextBoolean()) {
-                Camera.angle(Random.nextInt(0, 359));
             }
         }
 //        System.out.println("[DEBUG] Poll complete");

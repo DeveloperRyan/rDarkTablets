@@ -15,15 +15,15 @@ public class WalkToAltar extends Task {
     @Override
     public boolean activate() {
 
-        return !Constants.darkAltarArea.contains(Players.local().tile())
-                && Inventory.stream().filter(i -> i.name().equals("Dense essence block")).isNotEmpty()
+        return !Constants.DARK_ALTAR_AREA.contains(Players.local().tile())
+                && Inventory.stream().name(Constants.DENSE_ESSENCE_BLOCK).isNotEmpty()
                 && Inventory.isFull();
     }
 
     @Override
     public void execute() {
         System.out.println("[DEBUG] Walking to Altar");
-        Movement.builder(Constants.darkAltarArea.getRandomTile())
+        Movement.builder(Constants.DARK_ALTAR_AREA.getRandomTile())
                 .setRunMin(20).setRunMax(50)
                 .setWalkUntil(() -> ScriptManager.INSTANCE.isPaused() || ScriptManager.INSTANCE.isStopping())
                 .move();
